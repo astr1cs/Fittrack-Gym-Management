@@ -13,7 +13,14 @@ export class MembersService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
-
+async findByUserId(userId: string) {
+  const member = await this.memberRepository.findOne({
+    where: { user: { id: userId } },
+    relations: ['user', 'memberships', 'memberships.plan'],
+  })
+  if (!member) throw new NotFoundException('Member record not found')
+  return member
+}
   async findAll() {
     return this.memberRepository.find({
       relations: ['user'],

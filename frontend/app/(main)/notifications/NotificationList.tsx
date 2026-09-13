@@ -27,6 +27,9 @@ export default function NotificationList({
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications)
   const [markingAll, setMarkingAll] = useState(false)
 
+
+
+  
   useEffect(() => {
     if (!trainerId) return
 

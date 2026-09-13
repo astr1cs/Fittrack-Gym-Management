@@ -24,14 +24,13 @@ async function getMe(token: string) {
   return res.json()
 }
 
-async function getMemberRecord(userId: string, token: string) {
-  const res = await fetch(`${process.env.API_URL}/members`, {
+async function getMemberRecord(token: string) {
+  const res = await fetch(`${process.env.API_URL}/members/me`, {
     headers: { Cookie: `token=${token}` },
     cache: 'no-store',
   })
   if (!res.ok) return null
-  const members = await res.json()
-  return members.find((m: any) => m.user?.id === userId) ?? null
+  return res.json()
 }
 
 export default async function ClassDetailPage({
@@ -55,10 +54,10 @@ export default async function ClassDetailPage({
   const isAdmin = user?.role === 'admin'
   const isMember = user?.role === 'member'
 
-  let memberRecord = null
-  if (isMember) {
-    memberRecord = await getMemberRecord(user.id, token)
-  }
+let memberRecord = null
+if (isMember) {
+  memberRecord = await getMemberRecord(token)
+}
 
   const isEnrolled = cls.enrollments?.some(
     (e: any) => e.member?.user?.id === user?.id
