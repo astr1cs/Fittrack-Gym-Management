@@ -11,7 +11,7 @@ const allLinks = [
   { href: '/memberships', label: 'Memberships', roles: ['admin'] },
   { href: '/classes', label: 'Classes', roles: ['admin', 'member', 'trainer'] },
   { href: '/announcements', label: 'Announcements', roles: ['admin', 'member', 'trainer'] },
-  { href: '/notifications', label: 'Notifications', roles: ['admin', 'member', 'trainer'] },
+  { href: '/notifications', label: 'Notifications', roles: ['member', 'trainer'] },
 ]
 
 export default function Sidebar() {
@@ -55,7 +55,6 @@ export default function Sidebar() {
             <p className="text-xs text-gray-400 capitalize">{user.role}</p>
           </div>
         )}
-        <p className="text-xs text-gray-500">FitTrack v1.0.0</p>
       </div>
     </aside>
   )
