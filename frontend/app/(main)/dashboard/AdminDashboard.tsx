@@ -1,4 +1,5 @@
 import Card from '@/components/ui/Card'
+import StatCard from '@/components/ui/StatCard'
 import Link from 'next/link'
 import { createServerApi } from '@/lib/serverApi'
 
@@ -41,12 +42,7 @@ export default async function AdminDashboard({ token, user }: Props) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <Link href={stat.href} key={stat.label}>
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:border-blue-300 transition-all cursor-pointer">
-              <p className="text-sm text-gray-500">{stat.label}</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
-            </div>
-          </Link>
+          <StatCard key={stat.label} label={stat.label} value={stat.value} href={stat.href} />
         ))}
       </div>
 

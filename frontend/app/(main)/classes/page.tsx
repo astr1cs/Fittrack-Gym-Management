@@ -5,7 +5,7 @@ import Table from '@/components/ui/Table'
 import Badge from '@/components/ui/Badge'
 import { createServerApi } from '@/lib/serverApi'
 import CreateClassModal from './CreateClassModal'
-import DeleteClassButton from './DeleteClassButton'
+import DeleteButton from '@/components/ui/DeleteButton'
 
 async function getClasses(token: string) {
   try {
@@ -106,7 +106,7 @@ export default async function ClassesPage() {
                     Edit
                   </Link>
                 )}
-                <DeleteClassButton classId={cls.id} />
+                <DeleteButton endpoint={`/classes/${cls.id}`} resourceLabel="class" />
               </div>
             </td>
           </tr>

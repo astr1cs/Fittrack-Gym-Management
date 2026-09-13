@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import Card from '@/components/ui/Card'
 import { createServerApi } from '@/lib/serverApi'
 import CreateAnnouncementForm from './CreateAnnouncementForm'
-import DeleteAnnouncementButton from './DeleteAnnouncementButton'
+import DeleteButton from '@/components/ui/DeleteButton'
 
 async function getAnnouncements(token: string) {
   try {
@@ -70,7 +70,7 @@ export default async function AnnouncementsPage() {
                       })}
                     </p>
                   </div>
-                  <DeleteAnnouncementButton announcementId={announcement.id} />
+                  <DeleteButton endpoint={`/announcements/${announcement.id}`} resourceLabel="announcement" />
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed">
                   {announcement.content}

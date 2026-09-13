@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Table from '@/components/ui/Table'
 import { createServerApi } from '@/lib/serverApi'
-import DeleteMemberButton from './DeleteMemberButton'
+import DeleteButton from '@/components/ui/DeleteButton'
 
 async function getMembers(token: string) {
   try {
@@ -73,7 +73,7 @@ export default async function MembersPage() {
                 >
                   Edit
                 </Link>
-                <DeleteMemberButton memberId={member.id} />
+                <DeleteButton endpoint={`/members/${member.id}`} resourceLabel="member" />
               </div>
             </td>
           </tr>

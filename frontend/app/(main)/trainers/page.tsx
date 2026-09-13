@@ -5,7 +5,7 @@ import Table from '@/components/ui/Table'
 import Badge from '@/components/ui/Badge'
 import { createServerApi } from '@/lib/serverApi'
 import CreateTrainerModal from './CreateTrainerModal'
-import DeleteTrainerButton from './DeleteTrainerButton'
+import DeleteButton from '@/components/ui/DeleteButton'
 
 async function getTrainers(token: string) {
   try {
@@ -74,7 +74,7 @@ export default async function TrainersPage() {
                 >
                   View
                 </Link>
-                <DeleteTrainerButton trainerId={trainer.id} />
+                <DeleteButton endpoint={`/trainers/${trainer.id}`} resourceLabel="trainer" />
               </div>
             </td>
           </tr>

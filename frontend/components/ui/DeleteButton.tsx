@@ -5,7 +5,12 @@ import { useState } from 'react'
 import api from '@/lib/axios'
 import { useAuth } from '@/context/AuthContext'
 
-export default function DeleteTrainerButton({ trainerId }: { trainerId: string }) {
+interface DeleteButtonProps {
+  endpoint: string
+  resourceLabel: string
+}
+
+export default function DeleteButton({ endpoint, resourceLabel }: DeleteButtonProps) {
   const router = useRouter()
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
@@ -13,13 +18,13 @@ export default function DeleteTrainerButton({ trainerId }: { trainerId: string }
   if (user?.role !== 'admin') return null
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this trainer?')) return
+    if (!confirm(`Are you sure you want to delete this ${resourceLabel}?`)) return
     try {
       setLoading(true)
-      await api.delete(`/trainers/${trainerId}`)
+      await api.delete(endpoint)
       router.refresh()
     } catch {
-      alert('Failed to delete trainer')
+      alert(`Failed to delete ${resourceLabel}`)
     } finally {
       setLoading(false)
     }
@@ -29,7 +34,7 @@ export default function DeleteTrainerButton({ trainerId }: { trainerId: string }
     <button
       onClick={handleDelete}
       disabled={loading}
-      className="text-sm text-red-500 hover:underline font-medium disabled:opacity-50"
+      className="text-sm text-red-500 hover:underline font-medium disabled:opacity-50 shrink-0"
     >
       {loading ? 'Deleting...' : 'Delete'}
     </button>

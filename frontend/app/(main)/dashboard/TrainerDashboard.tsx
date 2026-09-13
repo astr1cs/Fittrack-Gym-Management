@@ -1,5 +1,6 @@
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
+import StatCard from '@/components/ui/StatCard'
 import Link from 'next/link'
 import { createServerApi } from '@/lib/serverApi'
 
@@ -44,19 +45,9 @@ export default async function TrainerDashboard({ token, user }: Props) {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <p className="text-sm text-gray-500">Total Classes</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">
-            {data.classes.length}
-          </p>
-        </div>
+        <StatCard label="Total Classes" value={data.classes.length} />
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <p className="text-sm text-gray-500">Upcoming Classes</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">
-            {upcomingClasses.length}
-          </p>
-        </div>
+        <StatCard label="Upcoming Classes" value={upcomingClasses.length} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
