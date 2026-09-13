@@ -16,26 +16,26 @@ export class AnnouncementsService {
     private pusherService: PusherService,
   ) {}
 
-  async create(dto: CreateAnnouncementDto, userId: string) {
-    const user = await this.userRepository.findOne({ where: { id: userId } })
-    if (!user) throw new NotFoundException('User not found')
+async create(dto: CreateAnnouncementDto, userId: string) {
+  const user = await this.userRepository.findOne({ where: { id: userId } })
+  if (!user) throw new NotFoundException('User not found')
 
-    const announcement = this.announcementRepository.create({
-      title: dto.title,
-      content: dto.content,
-      created_by: user,
-    })
+  const announcement = this.announcementRepository.create({
+    title: dto.title,
+    content: dto.content,
+    created_by: user,
+  })
 
-    await this.announcementRepository.save(announcement)
+  await this.announcementRepository.save(announcement)
 
-    await this.pusherService.trigger('announcements', 'new-announcement', {
-      title: announcement.title,
-      content: announcement.content,
-      createdAt: announcement.created_at,
-    })
+  await this.pusherService.trigger('announcements', 'new-announcement', {
+    title: announcement.title,
+    content: announcement.content,
+    createdAt: announcement.created_at,
+  })
 
-    return announcement
-  }
+  return announcement
+}
 
   async findAll() {
     return this.announcementRepository.find({

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm'
 import { Enrollment } from '../entities/enrollment.entity'
 import { Class } from '../entities/class.entity'
 import { Member } from '../entities/member.entity'
+import { Notification } from '../entities/notification.entity'
 import { PusherService } from '../pusher/pusher.service'
 
 @Injectable()
@@ -15,6 +16,8 @@ export class EnrollmentsService {
     private classRepository: Repository<Class>,
     @InjectRepository(Member)
     private memberRepository: Repository<Member>,
+    @InjectRepository(Notification)
+    private notificationRepository: Repository<Notification>,
     private pusherService: PusherService,
   ) {}
 
@@ -42,6 +45,12 @@ export class EnrollmentsService {
 
     const enrollment = this.enrollmentRepository.create({ class: cls, member })
     await this.enrollmentRepository.save(enrollment)
+
+    const notification = this.notificationRepository.create({
+      user: cls.trainer.user,
+      message: `${member.user.name} enrolled in ${cls.title}`,
+    })
+    await this.notificationRepository.save(notification)
 
     await this.pusherService.trigger(
       `trainer-${cls.trainer.id}`,

@@ -15,7 +15,14 @@ export class TrainersService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
-
+  async findByUserId(userId: string) {
+  const trainer = await this.trainerRepository.findOne({
+    where: { user: { id: userId } },
+    relations: ['user', 'classes'],
+  })
+  if (!trainer) throw new NotFoundException('Trainer record not found')
+  return trainer
+}
   async create(dto: CreateTrainerDto) {
     const hashed = await bcrypt.hash(dto.password, 10)
 

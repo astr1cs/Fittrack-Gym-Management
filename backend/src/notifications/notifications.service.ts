@@ -45,16 +45,16 @@ export class NotificationsService {
     return notification
   }
 
-  async markAllAsRead(userId: string) {
-    await this.notificationRepository
-      .createQueryBuilder()
-      .update(Notification)
-      .set({ is_read: true })
-      .where('user_id = :userId', { userId })
-      .execute()
+async markAllAsRead(userId: string) {
+  await this.notificationRepository
+    .createQueryBuilder()
+    .update(Notification)
+    .set({ is_read: true })
+    .where('"userId" = :userId', { userId })
+    .execute()
 
-    return { message: 'All notifications marked as read' }
-  }
+  return { message: 'All notifications marked as read' }
+}
 
   async getUnreadCount(userId: string) {
     const count = await this.notificationRepository.count({

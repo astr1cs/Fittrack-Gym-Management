@@ -1,7 +1,14 @@
 import Pusher from 'pusher-js'
 
-const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-  cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-})
+let pusherInstance: Pusher | null = null
 
-export default pusher
+function getPusher() {
+  if (!pusherInstance) {
+    pusherInstance = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+    })
+  }
+  return pusherInstance
+}
+
+export default getPusher()

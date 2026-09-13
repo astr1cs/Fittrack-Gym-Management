@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common'
 import { TrainersService } from './trainers.service'
 import { CreateTrainerDto } from './dto/create-trainer.dto'
 import { UpdateTrainerDto } from './dto/update-trainer.dto'
@@ -6,6 +6,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { RolesGuard } from '../auth/roles.guard'
 import { Roles } from '../auth/roles.decorator'
 import { UserRole } from '../entities/user.entity'
+import { Request } from 'express'
 
 @Controller('trainers')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -21,6 +22,11 @@ export class TrainersController {
   @Get()
   findAll() {
     return this.trainersService.findAll()
+  }
+
+  @Get('me')
+  getMyTrainerRecord(@Req() req: Request & { user: any }) {
+    return this.trainersService.findByUserId(req.user.id)
   }
 
   @Get(':id')

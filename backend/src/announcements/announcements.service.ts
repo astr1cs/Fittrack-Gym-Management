@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { In, Repository } from 'typeorm'
 import { Announcement } from '../entities/announcement.entity'
-import { User } from '../entities/user.entity'
+import { User, UserRole } from '../entities/user.entity'
+import { Notification } from '../entities/notification.entity'
 import { CreateAnnouncementDto } from './dto/create-announcement.dto'
 import { PusherService } from '../pusher/pusher.service'
 
@@ -13,6 +14,8 @@ export class AnnouncementsService {
     private announcementRepository: Repository<Announcement>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Notification)
+    private notificationRepository: Repository<Notification>,
     private pusherService: PusherService,
   ) {}
 
@@ -27,6 +30,18 @@ export class AnnouncementsService {
     })
 
     await this.announcementRepository.save(announcement)
+
+    const recipients = await this.userRepository.find({
+      where: { role: In([UserRole.MEMBER, UserRole.TRAINER]) },
+    })
+
+    const notifications = recipients.map((recipient) =>
+      this.notificationRepository.create({
+        user: recipient,
+        message: `New announcement: ${announcement.title}`,
+      }),
+    )
+    await this.notificationRepository.save(notifications)
 
     await this.pusherService.trigger('announcements', 'new-announcement', {
       title: announcement.title,

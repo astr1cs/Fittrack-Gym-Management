@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import api from '@/lib/axios'
 import pusher from '@/lib/pusher'
+import { useAuth } from '@/context/AuthContext'
+import { useNotifications } from '@/context/NotificationContext'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 
@@ -15,53 +17,48 @@ interface Notification {
 
 interface Props {
   initialNotifications: Notification[]
-  userId: string
-  trainerId?: string
 }
 
-export default function NotificationList({
-  initialNotifications,
-  userId,
-  trainerId,
-}: Props) {
+export default function NotificationList({ initialNotifications }: Props) {
+  const { user } = useAuth()
+  const { refreshUnreadCount } = useNotifications()
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications)
   const [markingAll, setMarkingAll] = useState(false)
 
+  const refresh = async () => {
+    try {
+      const res = await api.get('/notifications')
+      setNotifications(res.data)
+    } catch {
+      // keep showing the last known list if the refetch fails
+    }
+  }
 
-
-  
   useEffect(() => {
-    if (!trainerId) return
-
-    const channel = pusher.subscribe(`trainer-${trainerId}`)
-
-    channel.bind('new-enrollment', (data: { className: string; memberName: string }) => {
-      const newNotification: Notification = {
-        id: Date.now().toString(),
-        message: `${data.memberName} enrolled in ${data.className}`,
-        is_read: false,
-        created_at: new Date().toISOString(),
-      }
-      setNotifications((prev) => [newNotification, ...prev])
-    })
+    if (!user) return
 
     const announcementChannel = pusher.subscribe('announcements')
+    announcementChannel.bind('new-announcement', refresh)
 
-    announcementChannel.bind('new-announcement', (data: { title: string }) => {
-      const newNotification: Notification = {
-        id: Date.now().toString(),
-        message: `New announcement: ${data.title}`,
-        is_read: false,
-        created_at: new Date().toISOString(),
-      }
-      setNotifications((prev) => [newNotification, ...prev])
-    })
+    let trainerChannelName: string | null = null
+    if (user.role === 'trainer') {
+      api
+        .get('/trainers/me')
+        .then((res) => {
+          trainerChannelName = `trainer-${res.data.id}`
+          const trainerChannel = pusher.subscribe(trainerChannelName)
+          trainerChannel.bind('new-enrollment', refresh)
+        })
+        .catch(() => {})
+    }
 
     return () => {
-      pusher.unsubscribe(`trainer-${trainerId}`)
-      pusher.unsubscribe('announcements')
+      announcementChannel.unbind('new-announcement', refresh)
+      if (trainerChannelName) {
+        pusher.channel(trainerChannelName)?.unbind('new-enrollment', refresh)
+      }
     }
-  }, [trainerId])
+  }, [user])
 
   const markAsRead = async (id: string) => {
     try {
@@ -69,6 +66,7 @@ export default function NotificationList({
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
       )
+      await refreshUnreadCount()
     } catch {
       alert('Failed to mark as read')
     }
@@ -79,6 +77,7 @@ export default function NotificationList({
       setMarkingAll(true)
       await api.patch('/notifications/read-all')
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })))
+      await refreshUnreadCount()
     } catch {
       alert('Failed to mark all as read')
     } finally {
@@ -119,11 +118,7 @@ export default function NotificationList({
                 ${notification.is_read ? 'border-gray-200' : 'border-blue-200 bg-blue-50'}`}
             >
               <div className="flex flex-col gap-1">
-                <p
-                  className={`text-sm ${
-                    notification.is_read ? 'text-gray-600' : 'text-gray-900 font-medium'
-                  }`}
-                >
+                <p className={`text-sm ${notification.is_read ? 'text-gray-600' : 'text-gray-900 font-medium'}`}>
                   {notification.message}
                 </p>
                 <p className="text-xs text-gray-400">

@@ -4,11 +4,12 @@ import { AnnouncementsController } from './announcements.controller'
 import { AnnouncementsService } from './announcements.service'
 import { Announcement } from '../entities/announcement.entity'
 import { User } from '../entities/user.entity'
+import { Notification } from '../entities/notification.entity'
 import { AuthModule } from '../auth/auth.module'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Announcement, User]),
+    TypeOrmModule.forFeature([Announcement, User, Notification]),
     AuthModule,
   ],
   controllers: [AnnouncementsController],

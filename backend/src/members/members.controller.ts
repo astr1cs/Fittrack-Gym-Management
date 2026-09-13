@@ -12,21 +12,21 @@ import { Request } from 'express'
 export class MembersController {
   constructor(private membersService: MembersService) {}
 
-  @Get()
-  @Roles(UserRole.ADMIN)
-  findAll() {
-    return this.membersService.findAll()
-  }
+@Get()
+@Roles(UserRole.ADMIN)
+findAll() {
+  return this.membersService.findAll()
+}
 
-  @Get('me')
-  getMyMemberRecord(@Req() req: Request & { user: any }) {
-    return this.membersService.findByUserId(req.user.id)
-  }
+@Get('me')
+getMyMemberRecord(@Req() req: Request & { user: any }) {
+  return this.membersService.findByUserId(req.user.id)
+}
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.membersService.findOne(id)
-  }
+@Get(':id')
+findOne(@Param('id') id: string) {
+  return this.membersService.findOne(id)
+}
 
   @Patch(':id')
   @Roles(UserRole.ADMIN)

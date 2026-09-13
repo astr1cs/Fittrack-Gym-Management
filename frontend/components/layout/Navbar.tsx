@@ -2,21 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
 import api from '@/lib/axios'
 import { useAuth } from '@/context/AuthContext'
+import { useNotifications } from '@/context/NotificationContext'
 
 export default function Navbar() {
   const router = useRouter()
   const { user } = useAuth()
-  const [unreadCount, setUnreadCount] = useState(0)
-
-  useEffect(() => {
-    if (!user) return
-    api.get('/notifications/unread-count').then((res) => {
-      setUnreadCount(res.data.unread_count)
-    }).catch(() => {})
-  }, [user])
+  const { unreadCount } = useNotifications()
 
   const handleLogout = async () => {
     await api.post('/auth/logout')
@@ -37,7 +30,7 @@ export default function Navbar() {
           Notifications
           {unreadCount > 0 && (
             <span className="absolute -top-2 -right-4 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              {unreadCount}
+              {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
         </Link>
