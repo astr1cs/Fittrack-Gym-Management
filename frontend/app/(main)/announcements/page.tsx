@@ -1,25 +1,26 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Card from '@/components/ui/Card'
+import { createServerApi } from '@/lib/serverApi'
 import CreateAnnouncementForm from './CreateAnnouncementForm'
 import DeleteAnnouncementButton from './DeleteAnnouncementButton'
 
 async function getAnnouncements(token: string) {
-  const res = await fetch(`${process.env.API_URL}/announcements`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return []
-  return res.json()
+  try {
+    const res = await createServerApi(token).get('/announcements')
+    return res.data
+  } catch {
+    return []
+  }
 }
 
 async function getMe(token: string) {
-  const res = await fetch(`${process.env.API_URL}/auth/me`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return null
-  return res.json()
+  try {
+    const res = await createServerApi(token).get('/auth/me')
+    return res.data
+  } catch {
+    return null
+  }
 }
 
 export default async function AnnouncementsPage() {

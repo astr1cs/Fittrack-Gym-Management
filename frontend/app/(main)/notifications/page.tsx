@@ -1,14 +1,15 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { createServerApi } from '@/lib/serverApi'
 import NotificationList from './NotificationList'
 
 async function getNotifications(token: string) {
-  const res = await fetch(`${process.env.API_URL}/notifications`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return []
-  return res.json()
+  try {
+    const res = await createServerApi(token).get('/notifications')
+    return res.data
+  } catch {
+    return []
+  }
 }
 
 export default async function NotificationsPage() {

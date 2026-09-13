@@ -3,34 +3,35 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Table from '@/components/ui/Table'
 import Badge from '@/components/ui/Badge'
+import { createServerApi } from '@/lib/serverApi'
 import CreateClassModal from './CreateClassModal'
 import DeleteClassButton from './DeleteClassButton'
 
 async function getClasses(token: string) {
-  const res = await fetch(`${process.env.API_URL}/classes`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return []
-  return res.json()
+  try {
+    const res = await createServerApi(token).get('/classes')
+    return res.data
+  } catch {
+    return []
+  }
 }
 
 async function getTrainers(token: string) {
-  const res = await fetch(`${process.env.API_URL}/trainers`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return []
-  return res.json()
+  try {
+    const res = await createServerApi(token).get('/trainers')
+    return res.data
+  } catch {
+    return []
+  }
 }
 
 async function getMe(token: string) {
-  const res = await fetch(`${process.env.API_URL}/auth/me`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return null
-  return res.json()
+  try {
+    const res = await createServerApi(token).get('/auth/me')
+    return res.data
+  } catch {
+    return null
+  }
 }
 
 export default async function ClassesPage() {

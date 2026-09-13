@@ -3,24 +3,24 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import Badge from '@/components/ui/Badge'
 import Card from '@/components/ui/Card'
+import { createServerApi } from '@/lib/serverApi'
 
 async function getMember(id: string, token: string) {
-  const res = await fetch(`${process.env.API_URL}/members/${id}`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (res.status === 404) return null
-  if (!res.ok) return null
-  return res.json()
+  try {
+    const res = await createServerApi(token).get(`/members/${id}`)
+    return res.data
+  } catch {
+    return null
+  }
 }
 
 async function getMe(token: string) {
-  const res = await fetch(`${process.env.API_URL}/auth/me`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return null
-  return res.json()
+  try {
+    const res = await createServerApi(token).get('/auth/me')
+    return res.data
+  } catch {
+    return null
+  }
 }
 
 export default async function MemberDetailPage({ params }: { params: Promise<{ id: string }> }) {

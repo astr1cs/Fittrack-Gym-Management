@@ -2,27 +2,24 @@ import { cookies } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import Table from '@/components/ui/Table'
+import { createServerApi } from '@/lib/serverApi'
 
 async function getEnrollments(classId: string, token: string) {
-  const res = await fetch(
-    `${process.env.API_URL}/classes/${classId}/enrollments`,
-    {
-      headers: { Cookie: `token=${token}` },
-      cache: 'no-store',
-    }
-  )
-  if (res.status === 404) return null
-  if (!res.ok) return []
-  return res.json()
+  try {
+    const res = await createServerApi(token).get(`/classes/${classId}/enrollments`)
+    return res.data
+  } catch {
+    return []
+  }
 }
 
 async function getClass(classId: string, token: string) {
-  const res = await fetch(`${process.env.API_URL}/classes/${classId}`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return null
-  return res.json()
+  try {
+    const res = await createServerApi(token).get(`/classes/${classId}`)
+    return res.data
+  } catch {
+    return null
+  }
 }
 
 export default async function EnrollmentsPage({

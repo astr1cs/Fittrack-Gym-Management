@@ -1,32 +1,19 @@
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Link from 'next/link'
+import { createServerApi } from '@/lib/serverApi'
 
-async function getMemberData(token: string, userId: string) {
-  const baseUrl = process.env.API_URL
+async function getMemberData(token: string) {
+  const api = createServerApi(token)
 
-  const membersRes = await fetch(`${baseUrl}/members`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  const members = membersRes.ok ? await membersRes.json() : []
-  const memberRecord = members.find((m: any) => m.user?.id === userId)
+  const memberRecord = await api.get('/members/me').then((res) => res.data).catch(() => null)
 
   if (!memberRecord) return { member: null, enrollments: [], announcements: [] }
 
-  const [enrollmentsRes, announcementsRes] = await Promise.all([
-    fetch(`${baseUrl}/classes/member/${memberRecord.id}`, {
-      headers: { Cookie: `token=${token}` },
-      cache: 'no-store',
-    }),
-    fetch(`${baseUrl}/announcements`, {
-      headers: { Cookie: `token=${token}` },
-      cache: 'no-store',
-    }),
+  const [enrollments, announcements] = await Promise.all([
+    api.get(`/classes/member/${memberRecord.id}`).then((res) => res.data).catch(() => []),
+    api.get('/announcements').then((res) => res.data).catch(() => []),
   ])
-
-  const enrollments = enrollmentsRes.ok ? await enrollmentsRes.json() : []
-  const announcements = announcementsRes.ok ? await announcementsRes.json() : []
 
   return { member: memberRecord, enrollments, announcements }
 }
@@ -37,7 +24,7 @@ interface Props {
 }
 
 export default async function MemberDashboard({ token, user }: Props) {
-  const data = await getMemberData(token, user.id)
+  const data = await getMemberData(token)
   const activeMembership = data.member?.memberships?.find((m: any) => m.status === 'active')
 
   return (

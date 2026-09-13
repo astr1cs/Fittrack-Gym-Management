@@ -2,24 +2,25 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Table from '@/components/ui/Table'
+import { createServerApi } from '@/lib/serverApi'
 import DeleteMemberButton from './DeleteMemberButton'
 
 async function getMembers(token: string) {
-  const res = await fetch(`${process.env.API_URL}/members`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return []
-  return res.json()
+  try {
+    const res = await createServerApi(token).get('/members')
+    return res.data
+  } catch {
+    return []
+  }
 }
 
 async function getMe(token: string) {
-  const res = await fetch(`${process.env.API_URL}/auth/me`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return null
-  return res.json()
+  try {
+    const res = await createServerApi(token).get('/auth/me')
+    return res.data
+  } catch {
+    return null
+  }
 }
 
 export default async function MembersPage() {

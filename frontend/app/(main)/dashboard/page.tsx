@@ -1,16 +1,17 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { createServerApi } from '@/lib/serverApi'
 import AdminDashboard from './AdminDashboard'
 import MemberDashboard from './MemberDashboard'
 import TrainerDashboard from './TrainerDashboard'
 
 async function getMe(token: string) {
-  const res = await fetch(`${process.env.API_URL}/auth/me`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return null
-  return res.json()
+  try {
+    const res = await createServerApi(token).get('/auth/me')
+    return res.data
+  } catch {
+    return null
+  }
 }
 
 export default async function DashboardPage() {

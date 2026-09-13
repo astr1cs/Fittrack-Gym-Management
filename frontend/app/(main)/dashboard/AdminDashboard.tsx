@@ -1,20 +1,16 @@
 import Card from '@/components/ui/Card'
 import Link from 'next/link'
+import { createServerApi } from '@/lib/serverApi'
 
 async function getAdminData(token: string) {
-  const baseUrl = process.env.API_URL
+  const api = createServerApi(token)
 
-  const [membersRes, trainersRes, classesRes, plansRes] = await Promise.all([
-    fetch(`${baseUrl}/members`, { headers: { Cookie: `token=${token}` }, cache: 'no-store' }),
-    fetch(`${baseUrl}/trainers`, { headers: { Cookie: `token=${token}` }, cache: 'no-store' }),
-    fetch(`${baseUrl}/classes`, { headers: { Cookie: `token=${token}` }, cache: 'no-store' }),
-    fetch(`${baseUrl}/memberships/plans`, { headers: { Cookie: `token=${token}` }, cache: 'no-store' }),
+  const [members, trainers, classes, plans] = await Promise.all([
+    api.get('/members').then((res) => res.data).catch(() => []),
+    api.get('/trainers').then((res) => res.data).catch(() => []),
+    api.get('/classes').then((res) => res.data).catch(() => []),
+    api.get('/memberships/plans').then((res) => res.data).catch(() => []),
   ])
-
-  const members = membersRes.ok ? await membersRes.json() : []
-  const trainers = trainersRes.ok ? await trainersRes.json() : []
-  const classes = classesRes.ok ? await classesRes.json() : []
-  const plans = plansRes.ok ? await plansRes.json() : []
 
   return { members, trainers, classes, plans }
 }

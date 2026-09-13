@@ -3,15 +3,15 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
+import { createServerApi } from '@/lib/serverApi'
 
 async function getTrainer(id: string, token: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/trainers/${id}`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (res.status === 404) return null
-  if (!res.ok) return null
-  return res.json()
+  try {
+    const res = await createServerApi(token).get(`/trainers/${id}`)
+    return res.data
+  } catch {
+    return null
+  }
 }
 
 export default async function TrainerDetailPage({ params }: { params: Promise<{ id: string }> }) {

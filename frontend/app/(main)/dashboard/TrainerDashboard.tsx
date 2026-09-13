@@ -1,24 +1,16 @@
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Link from 'next/link'
+import { createServerApi } from '@/lib/serverApi'
 
-async function getTrainerData(token: string, userId: string) {
-  const baseUrl = process.env.API_URL
+async function getTrainerData(token: string) {
+  const api = createServerApi(token)
 
-  const trainersRes = await fetch(`${baseUrl}/trainers`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  const trainers = trainersRes.ok ? await trainersRes.json() : []
-  const trainerRecord = trainers.find((t: any) => t.user?.id === userId)
+  const trainerRecord = await api.get('/trainers/me').then((res) => res.data).catch(() => null)
 
   if (!trainerRecord) return { trainer: null, classes: [], announcements: [] }
 
-  const announcementsRes = await fetch(`${baseUrl}/announcements`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  const announcements = announcementsRes.ok ? await announcementsRes.json() : []
+  const announcements = await api.get('/announcements').then((res) => res.data).catch(() => [])
 
   return { trainer: trainerRecord, classes: trainerRecord.classes ?? [], announcements }
 }
@@ -29,7 +21,7 @@ interface Props {
 }
 
 export default async function TrainerDashboard({ token, user }: Props) {
-  const data = await getTrainerData(token, user.id)
+  const data = await getTrainerData(token)
 
   const upcomingClasses = data.classes
     .filter((cls: any) => new Date(cls.schedule) > new Date())

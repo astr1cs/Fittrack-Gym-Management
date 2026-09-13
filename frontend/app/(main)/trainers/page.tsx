@@ -3,24 +3,36 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Table from '@/components/ui/Table'
 import Badge from '@/components/ui/Badge'
+import { createServerApi } from '@/lib/serverApi'
 import CreateTrainerModal from './CreateTrainerModal'
 import DeleteTrainerButton from './DeleteTrainerButton'
 
 async function getTrainers(token: string) {
-  const res = await fetch(`${process.env.API_URL}/trainers`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return []
-  return res.json()
+  try {
+    const res = await createServerApi(token).get('/trainers')
+    return res.data
+  } catch {
+    return []
+  }
+}
+
+async function getMe(token: string) {
+  try {
+    const res = await createServerApi(token).get('/auth/me')
+    return res.data
+  } catch {
+    return null
+  }
 }
 
 export default async function TrainersPage() {
   const cookieStore = await cookies()
   const token = cookieStore.get('token')?.value
   if (!token) redirect('/auth/login')
-const user = await getMe(token)
-if (user?.role !== 'admin') redirect('/dashboard')
+
+  const user = await getMe(token)
+  if (user?.role !== 'admin') redirect('/dashboard')
+
   const trainers = await getTrainers(token)
 
   const columns = [
@@ -30,14 +42,7 @@ if (user?.role !== 'admin') redirect('/dashboard')
     { key: 'classes', label: 'Classes' },
     { key: 'actions', label: 'Actions' },
   ]
-async function getMe(token: string) {
-  const res = await fetch(`${process.env.API_URL}/auth/me`, {
-    headers: { Cookie: `token=${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) return null
-  return res.json()
-}
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
