@@ -23,18 +23,22 @@ export default function Navbar() {
         <span className="font-medium text-gray-800">{user?.name ?? '...'}</span>
       </p>
       <div className="flex items-center gap-4">
-        <Link
-          href="/notifications"
-          className="relative text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors"
-        >
-          Notifications
-          {unreadCount > 0 && (
-            <span className="absolute -top-2 -right-4 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </span>
-          )}
-        </Link>
-        <div className="w-px h-4 bg-gray-300" />
+        {user?.role !== 'admin' && (
+          <>
+            <Link
+              href="/notifications"
+              className="relative text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors"
+            >
+              Notifications
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 -right-4 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </Link>
+            <div className="w-px h-4 bg-gray-300" />
+          </>
+        )}
         <span className="text-xs text-gray-400 capitalize bg-gray-100 px-2 py-1 rounded-full">
           {user?.role}
         </span>
